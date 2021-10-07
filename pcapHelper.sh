@@ -551,7 +551,7 @@ while true; do
             net-stats -l | head -1 
             net-stats -l | grep -i vmk
             echo ""
-            echo "Pick a vmkernel interface from the ClientName column in the above list. This is case sensitive:"
+            echo "Enter the name of a vmkernel interface from the ClientName column in the above list. This is case sensitive:"
             read CLIENT
             if [ "$(net-stats -l | awk '{print $6}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
@@ -575,7 +575,7 @@ while true; do
             net-stats -l | head -1 
             net-stats -l | grep -i eth
             echo ""
-            echo "Mention the port number of the specific virtual machine network adapter from the PortNum column in the above list:"
+            echo "Enter the port number of the specific virtual machine network adapter from the PortNum column in the above list:"
             read CLIENT
             if [ "$(net-stats -l | awk '{print $1}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
@@ -597,7 +597,7 @@ while true; do
             echo ""
             net-stats -l 
             echo ""
-            echo "Mention the port number of the specific virtual machine network adapter or vmkernel interface from the PortNum column in the above list:"
+            echo "Enter the port number of the specific virtual machine network adapter or vmkernel interface from the PortNum column in the above list:"
             read CLIENT
             if [ "$(net-stats -l | awk '{print $1}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
@@ -621,7 +621,7 @@ while true; do
             net-stats -l | head -1 
             net-stats -l | grep vmnic
             echo ""
-            echo "Pick a hardware uplink from the ClientName column in the above list. This is case sensitive:"
+            echo "Enter the name of a hardware uplink from the ClientName column in the above list. This is case sensitive:"
             read CLIENT
             if [ "$(net-stats -l | awk '{print $6}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
@@ -691,9 +691,6 @@ case $PCAP_TIME in
         ;;
 esac
 exit
-
-echo "this is a test"
-echo "do we have ^M here also?"
 
 #End of script
 
