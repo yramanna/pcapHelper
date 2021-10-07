@@ -500,6 +500,17 @@ Duration(){
             echo ""
             echo "Invalid input. Please choose an option between 1-3."
         else
+            if [ $PCAP_TIME -eq 3 ]; then
+                echo "
+++++++++++++++++++++++++++++++
+|     PACKET CAPTURE SIZE    |
+++++++++++++++++++++++++++++++"
+                read -p "
+Enter the total size you want to limit the packet capture files to. The value must be entered in MB:
+" PCAP_SIZE
+                PCAP_SIZE_PER_FILE=`awk "BEGIN {print $PCAP_SIZE/20}"`
+                PCAP_COMMAND="${PCAP_COMMAND} -C ${PCAP_SIZE_PER_FILE}"
+            fi
             break
         fi
     done
