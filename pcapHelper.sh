@@ -500,7 +500,7 @@ Duration(){
             echo ""
             echo "Invalid input. Please choose an option between 1-3."
         else
-            if [ $PCAP_TIME -eq 3 ]; then
+            if [ $PCAP_TIME -gt 1 ]; then
                 echo "
 ++++++++++++++++++++++++++++++
 |     PACKET CAPTURE SIZE    |
