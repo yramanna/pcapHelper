@@ -160,7 +160,7 @@ You can filter the traffic using a MAC address, or using specific source and des
                     while true; do
                     echo "
 You can filter the traffic using an IP address, or using specific source and destination IP addresses. Please enter your choice (0/1/2/3/4)
-0. Return to main packet filter menu
+0. Return to packet filter menu
 1. Single IP address
 2. Specific source IP address
 3. Specific destination IP address
