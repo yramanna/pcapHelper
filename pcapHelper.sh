@@ -622,6 +622,7 @@ while true; do
                     2 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture PortInput"; DIR_TXT="outgoing";;
                     3 ) PCAP_COMMAND=" ${PCAP_COMMAND} --dir 2"; DIR_TXT="bidirectional";;
                 esac
+                CLIENT="$(net-stats -l | grep -i $CLIENT | awk '{print $6}')"
                 Filters
                 break
             fi
