@@ -509,6 +509,10 @@ Duration(){
 Enter the total size you want to limit the packet capture files to. The value must be entered in MB:
 " PCAP_SIZE
                 PCAP_SIZE_PER_FILE=`awk "BEGIN {print $PCAP_SIZE/20}"`
+                PCAP_SIZE_PER_FILE=$(echo $PCAP_SIZE_PER_FILE | awk '{print int($1)}')
+                if [ $PCAP_SIZE_PER_FILE -lt 1 ]; then
+                    PCAP_SIZE_PER_FILE=1
+                fi
                 PCAP_COMMAND="${PCAP_COMMAND} -C ${PCAP_SIZE_PER_FILE}"
             fi
             break
