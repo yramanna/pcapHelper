@@ -550,7 +550,7 @@ IP_FLAG=False; MAC_FLAG=False; VLAN_FLAG=False; PORT_FLAG=False; PROTO_FLAG=Fals
 
 #Regular expressions to match valid MAC addresses, IP addresses and port numbers
 MAC_REGEX='^[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}:[0-9A-Fa-f]{2}$'
-IP_REGEX='^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+IP_REGEX='^([0-9]{1,2}|(0|1)[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|(0|1)[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|(0|1)[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|(0|1)[0-9]{2}|2[0-4][0-9]|25[0-5])$'
 PORT_REGEX='^[0-9]{1,5}$'
 
 #Get the level of packet capture
