@@ -233,7 +233,7 @@ You can filter the traffic using an IP address, or using specific source and des
                         echo "Invalid input. Please enter a valid VLAN ID."					
                     else
                         VLAN_FLAG=True
-                        PCAP_COMMAND=" ${PCAP_COMMAND} --vlan ${VLAN}"
+                        PCAP_COMMAND=" ${PCAP_COMMAND} --vlan ${VLAN_ID}"
                     fi
                 else
                     echo ""
@@ -530,7 +530,11 @@ Directory(){
         echo ""
         echo "Enter the directory to save the packet capture file(s) in:"
         read DIR
-        if [ -d "$DIR" ]; then
+        if [ ! "$DIR" ]; then
+            DIR=$(pwd)
+            PCAP_COMMAND="${PCAP_COMMAND} -s 150 -o $DIR/"$CAP_POINT_TXT"_"$CLIENT"_"$DIR_TXT"_01.pcap"
+            break
+        elif [ -d "$DIR" ]; then
             PCAP_COMMAND="${PCAP_COMMAND} -s 150 -o $DIR/"$CAP_POINT_TXT"_"$CLIENT"_"$DIR_TXT"_01.pcap"
             break
         elif [ -d "/$DIR" ]; then
