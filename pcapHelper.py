@@ -1,7 +1,6 @@
 import subprocess
 import os
-def Filters()
-{
+def Filters():
 	subprocess.call(["echo","\n++++++++++++++++++++++++++++++\n|   PACKET CAPTURE FILTERS   |\n++++++++++++++++++++++++++++++"])
 	while True:
 		CHOICE1=input("\nDo you want to further filter this packet capture using any of the below options? (0/1/2/3/4/5)\n0. NO\n1. PROTOCOL\n2. MAC\n3. IP\n4. VLAN\n5. PORT\n")
@@ -239,11 +238,9 @@ def Filters()
 				subprocess.call(["echo","Port filter has already been applied once. Please select another filter or exit this menu."])
         else:
 			subprocess.call(["echo","Invalid input. Please choose an option between 1-5 from the above list. Enter 0 to exit the packet filter menu."])
-}
 
 #Function to input the level of packet capture
-def Level()
-{
+def Level():
 	subprocess.call(["echo","\n++++++++++++++++++++++++++++++\n|    PACKET CAPTURE LEVEL    |\n++++++++++++++++++++++++++++++"])
 	while True:
 		CAP_POINT=input("\nChoose the level you want to capture packets at (1/2/3/4)\n1. vmkernel interface\n2. virtual network adapter\n3. virtual switch port\n4. hardware network adapter/uplink\n")
@@ -251,11 +248,9 @@ def Level()
             subprocess.call(["echo","Invalid input. Please choose an option between 1-4."])
         else:
             break
-}
 
 #Function to input the direction of packet capture
-Direction()
-{
+def Direction():
     subprocess.call(["echo","\n++++++++++++++++++++++++++++++\n|  PACKET CAPTURE DIRECTION  |\n++++++++++++++++++++++++++++++"])
     while True:
 		VERSION=subprocess.call(["vmware","-vl","|","grep","-oe","[567]\.[057]","|","head -1"])
@@ -271,11 +266,9 @@ Direction()
                 subprocess.call(["echo","\nInvalid input. Please choose an option between 1-2."])
             else:
                 break
-}
 
 #Function to input the duration of packet capture
-Duration()
-{
+def Duration():
     subprocess.call(["echo","\n++++++++++++++++++++++++++++++\n|   PACKET CAPTURE DURATION  |\n++++++++++++++++++++++++++++++"])
     while True:
         TIME_CHOICE=input("\nChoose the duration you want to capture packets for (1/3)\n1. 3 minutes\n2. 1 hour\n3. Continuous (captures packets continuously until script is terminated)\n")
@@ -291,11 +284,9 @@ Duration()
 					PCAP_SIZE=input("\nEnter the total size you want to limit the packet capture files to. The value must be entered in MB: ")
 					PCAP_SIZE_PER_FILE=max(1,int(PCAP_SIZE)//20)
 					PCAP_COMMAND=PCAP_COMMAND+" -C "+PCAP_SIZE_PER_FILE
-}
 
 #Function to input the location to save the packet capture file(s) in
-Directory()
-{
+def Directory():
     subprocess.call(["echo","\n++++++++++++++++++++++++++++++\n|  PACKET CAPTURE DIRECTORY  |\n++++++++++++++++++++++++++++++"])
     while True:
         DIR=input("Enter the full path to the directory you want to save the packet capture file(s) in: ")
@@ -308,7 +299,6 @@ Directory()
             break
 		else:
             subprocess.call(["echo","Invalid input. Please enter a valid directory. Do not enter the filename."])
-}
 
 #Main code
 
