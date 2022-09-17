@@ -9,4 +9,5 @@ The script allows packet captures at the below capture points:
 4. Virtual switch port
 
 You can capture packets for durations of 3 minutes, 1 hour or continuosly until terminated. You can also apply filters to capture the required packets, specify capture direction and limit file size.
+
 The script validates all user inputs to ensure only valid pktcap-uw commands are generated.
