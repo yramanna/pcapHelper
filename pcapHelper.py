@@ -297,7 +297,7 @@ def Filters(PCAP_COMMAND):
 def Point():
     print("\n++++++++++++++++++++++++++++++\n|    PACKET CAPTURE LEVEL    |\n++++++++++++++++++++++++++++++")
     while True:
-        CAP_POINT=input("\nChoose the point you want to capture packets at (1/2/3/4)\n1. vmkernel interface\n2. virtual network adapter\n3. virtual switch port\n4. hardware network adapter/uplink\n")
+        CAP_POINT=input("\nChoose the packet capture point (1/2/3/4)\n1. vmkernel interface\n2. virtual network adapter\n3. virtual switch port\n4. hardware network adapter/uplink\n")
         if not re.match('^[1-4]$', CAP_POINT):
             print("\nInvalid input. Please choose an option between 1-4.")
         else:
