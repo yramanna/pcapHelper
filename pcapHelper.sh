@@ -713,5 +713,3 @@ esac
 exit
 
 #End of script
-
-
