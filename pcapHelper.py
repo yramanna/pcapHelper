@@ -47,7 +47,7 @@ print(intro)
 #User can navigate the menu to apply any needed filters. Each filter can only be applied once. Menu has been designed to prevent invalid combinations of filters
 #All user inputs are validated through regular expression matching
 def Filters(PCAP_COMMAND):
-    #Setting filter flags to ensure a filter can only be applied once
+    #Initializing filter flags to ensure a filter can only be applied once
     IP_FLAG, MAC_FLAG, VLAN_FLAG, PORT_FLAG, PROTO_FLAG=0, 0, 0, 0, 0
 
     #Regular expressions to match valid MAC addresses, IP addresses and port numbers
@@ -293,7 +293,7 @@ def Filters(PCAP_COMMAND):
             print("\nInvalid input. Please choose an option between 1-5 from the above list. Enter 0 to exit the packet filter menu.")
     return PCAP_COMMAND
 
-#Function to input the level of packet capture
+#Function to input the packet capture point
 def Point():
     print("\n++++++++++++++++++++++++++++++\n|    PACKET CAPTURE LEVEL    |\n++++++++++++++++++++++++++++++")
     while True:
@@ -304,7 +304,7 @@ def Point():
             break
     return CAP_POINT
 
-#Function to input the direction of packet capture
+#Function to input the packet capture direction
 def Direction():
     print("\n++++++++++++++++++++++++++++++\n|  PACKET CAPTURE DIRECTION  |\n++++++++++++++++++++++++++++++")
     while True:
@@ -323,7 +323,7 @@ def Direction():
                 break
     return DIR
 
-#Function to input the duration of packet capture
+#Function to input the packet capture duration
 def Duration(PCAP_COMMAND):
     print("\n++++++++++++++++++++++++++++++\n|   PACKET CAPTURE DURATION  |\n++++++++++++++++++++++++++++++")
     while True:
@@ -364,8 +364,11 @@ def Directory(PCAP_COMMAND, DIR_TXT, CAP_POINT_TXT, CLIENT):
     return PCAP_COMMAND
 
 #Main code
-#Get the level of packet capture
+
+#Get the packet capture point
 CAP_POINT=Point()
+
+#Initialize string variables to construct the packet capture command
 DIR_TXT = ''
 PCAP_COMMAND = ''
 
@@ -375,6 +378,7 @@ PCAP_COMMAND = ''
 while True:
     if int(CAP_POINT) == 1:
         CAP_POINT_TXT="vmkernel"
+        #Ensure the value entered is a valid vmkernel interface
         print()
         subprocess.call("net-stats -l | head -1", shell=True)
         subprocess.call("net-stats -l | grep vmk", shell=True)
@@ -383,7 +387,9 @@ while True:
         if subprocess.run("net-stats -l | grep vmk | awk '{print $6}' | grep -x "+CLIENT+" | wc -l", shell=True, stdout=subprocess.PIPE).stdout.decode()[0:-1] == '0':
             print("\nInvalid input. Please enter a valid vmkernel interface from the list. Run the script once more if you wish to choose a different capture point.")
         else:
+            #Add capture point to the command
             PCAP_COMMAND="pktcap-uw --vmk "+CLIENT
+            #Input packet capture direction and add it to the command
             DIR=int(Direction())
             if DIR == 1:
                 PCAP_COMMAND=PCAP_COMMAND+" --capture PortOutput"
@@ -394,10 +400,10 @@ while True:
             elif DIR == 3:
                 PCAP_COMMAND=PCAP_COMMAND+" --dir 2"
                 DIR_TXT="bidirectional"
-            PCAP_COMMAND=Filters(PCAP_COMMAND)
             break
     elif int(CAP_POINT) == 2:
         CAP_POINT_TXT="vnic"
+        #Ensure the value entered is a valid virtual machine network adapter switchport
         print()
         subprocess.call("net-stats -l | grep -vE 'vmk|vmnic|lag'", shell=True)
         print()
@@ -405,7 +411,9 @@ while True:
         if subprocess.run("net-stats -l | grep -vE 'vmk|vmnic|lag' | awk '{print $1}' | grep -x "+CLIENT+" | wc -l", shell=True, stdout=subprocess.PIPE).stdout.decode()[0:-1] == '0':
             print("\nInvalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture point.")
         else:
+            #Add capture point to the command
             PCAP_COMMAND="pktcap-uw --switchport "+CLIENT
+            #Input packet capture direction and add it to the command
             DIR=int(Direction())
             if DIR == 1:
                 PCAP_COMMAND=PCAP_COMMAND+" --capture vNicRx"
@@ -416,11 +424,12 @@ while True:
             elif DIR == 3:
                 PCAP_COMMAND=PCAP_COMMAND+" --capture VnicRx,vNicTx"
                 DIR_TXT="bidirectional"
-            PCAP_COMMAND=Filters(PCAP_COMMAND)
+            #Update CLIENT to reflect the name of the virtual machine network adapter
             CLIENT=subprocess.run("net-stats -l | grep "+CLIENT+" | awk '{print $6}'", shell=True, stdout=subprocess.PIPE).stdout.decode()[0:-1]
             break
     elif int(CAP_POINT) == 3:
         CAP_POINT_TXT="switchport"
+        #Ensure the value entered is a valid virtual switchport
         print()
         subprocess.call("net-stats -l", shell=True)
         print()
@@ -428,7 +437,9 @@ while True:
         if subprocess.run("net-stats -l | awk '{print $1}' | grep -x "+CLIENT+" | wc -l", shell=True, stdout=subprocess.PIPE).stdout.decode()[0:-1] == '0':
             print("\nInvalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture point.")
         else:
+            #Add capture point to the command
             PCAP_COMMAND="pktcap-uw --switchport "+CLIENT
+            #Input packet capture direction and add it to the command
             DIR=int(Direction())
             if DIR == 1:
                 PCAP_COMMAND=PCAP_COMMAND+" --capture PortOutput"
@@ -440,10 +451,10 @@ while True:
                 PCAP_COMMAND=PCAP_COMMAND+" --dir 2"
                 DIR_TXT="bidirectional"
                 CLIENT=subprocess.call(["net-stats","-l","|","grep","-i",CLIENT,"|","awk","'{print","$6}'"])
-            PCAP_COMMAND=Filters(PCAP_COMMAND)
             break
     elif int(CAP_POINT) == 4:
         CAP_POINT_TXT="uplink"
+        #Ensure the value entered is a valid physical uplink
         print()
         subprocess.call("net-stats -l | head -1", shell=True)
         subprocess.call("net-stats -l | grep vmnic", shell=True)
@@ -452,7 +463,9 @@ while True:
         if subprocess.run("net-stats -l | grep vmnic | awk '{print $6}' | grep -x "+CLIENT+" | wc -l", shell=True, stdout=subprocess.PIPE).stdout.decode()[0:-1] == '0':
             print("\nInvalid input. Please enter a valid hardware uplink from the list. Run the script once more if you wish to choose a different capture point.")
         else:
+            #Add capture point to the command
             PCAP_COMMAND="pktcap-uw --uplink "+CLIENT
+            #Input packet capture direction and add it to the command
             DIR=int(Direction())
             if DIR == 1:
                 PCAP_COMMAND=PCAP_COMMAND+" --capture UplinkRcvKernel"
@@ -463,10 +476,10 @@ while True:
             elif DIR == 3:
                 PCAP_COMMAND=PCAP_COMMAND+" --dir 2"
                 DIR_TXT="bidirectional"
-            PCAP_COMMAND=Filters(PCAP_COMMAND)
             break
-
-#We then call Duration() and Directory() to get the duration of packet captures and the location to save the fil(s) in
+            
+#The functions Filters, Duration and Directory are called to complete construction of the packet capture command
+PCAP_COMMAND=Filters(PCAP_COMMAND)
 PCAP_COMMAND, PCAP_TIME=Duration(PCAP_COMMAND)
 PCAP_COMMAND=Directory(PCAP_COMMAND, DIR_TXT, CAP_POINT_TXT, CLIENT)
 
