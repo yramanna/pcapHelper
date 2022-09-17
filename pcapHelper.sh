@@ -402,14 +402,14 @@ You can filter the traffic using a UDP port, or using specific source and destin
 }
 
 #Function to input the level of packet capture
-Level(){
+Point(){
     echo "
 ++++++++++++++++++++++++++++++
 |    PACKET CAPTURE LEVEL    |
 ++++++++++++++++++++++++++++++"
     while true; do
         echo "
-Choose the level you want to capture packets at (1/2/3/4)
+Choose the packet capture point (1/2/3/4)
 1. vmkernel interface
 2. virtual network adapter
 3. virtual switch port
@@ -457,28 +457,6 @@ Direction(){
             else 
                 break
             fi
-        fi
-    done
-}
-
-#Special function to input the direction of packet capture for virtual machine vnics
-#There is no command to capture both incoming and outgoing packets at the same time for a virtual machine vnic
-VM_Direction(){
-    echo "
-++++++++++++++++++++++++++++++
-|  PACKET CAPTURE DIRECTION  |
-++++++++++++++++++++++++++++++"
-    while true; do
-        echo ""
-        echo "Choose the direction you want to capture packets in (1/2)
-1. Incoming
-2. Outgoing"
-        read DIR
-        if [ ! $(echo "$DIR" | grep -xE '^[1-2]$') ]; then
-            echo ""
-            echo "Invalid input. Please choose an option between 1-2."
-        else
-            break
         fi
     done
 }
@@ -558,7 +536,7 @@ IP_REGEX='^([0-9]{1,2}|(0|1)[0-9]{2}|2[0-4][0-9]|25[0-5])\.([0-9]{1,2}|(0|1)[0-9
 PORT_REGEX='^[0-9]{1,5}$'
 
 #Get the level of packet capture
-Level
+Point
 
 #Based on the level of packet capture, we start constructing the packet capture command
 #Packet capture command is a string variable that is constructed using user inputs
@@ -575,7 +553,7 @@ while true; do
             if [ "$(net-stats -l | awk '{print $6}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
                 echo ""
-                echo "Invalid input. Please enter a valid vmkernel interface from the list. Run the script once more if you wish to choose a different capture level."
+                echo "Invalid input. Please enter a valid vmkernel interface from the list. Run the script once more if you wish to choose a different capture point."
             else
                 PCAP_COMMAND="pktcap-uw --vmk $CLIENT"
                 Direction
@@ -584,7 +562,6 @@ while true; do
                     2 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture PortInput"; DIR_TXT="outgoing";;
                     3 ) PCAP_COMMAND=" ${PCAP_COMMAND} --dir 2"; DIR_TXT="bidirectional";;
                 esac
-                Filters
                 break
                 fi
                 ;;
@@ -599,15 +576,15 @@ while true; do
             if [ "$(net-stats -l | awk '{print $1}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
                 echo ""
-                echo "Invalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture level."
+                echo "Invalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture point."
             else
                 PCAP_COMMAND="pktcap-uw --switchport $CLIENT"
-                VM_Direction
+                Direction
                 case $DIR in
                     1 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture VnicRx"; DIR_TXT="incoming";;
                     2 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture VnicTx"; DIR_TXT="outgoing";;
+		    3 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture VnicRx,VnicTx"; DIR_TXT="bidirectional";;
                 esac
-                Filters
                 break
             fi
             ;;
@@ -621,7 +598,7 @@ while true; do
             if [ "$(net-stats -l | awk '{print $1}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
                 echo ""
-                echo "Invalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture level."
+                echo "Invalid input. Please enter a valid port number from the list. Run the script once more if you wish to choose a different capture point."
             else
                 PCAP_COMMAND="pktcap-uw --switchport $CLIENT"
                 Direction
@@ -631,7 +608,6 @@ while true; do
                     3 ) PCAP_COMMAND=" ${PCAP_COMMAND} --dir 2"; DIR_TXT="bidirectional";;
                 esac
                 CLIENT="$(net-stats -l | grep -i $CLIENT | awk '{print $6}')"
-                Filters
                 break
             fi
             ;;
@@ -646,7 +622,7 @@ while true; do
             if [ "$(net-stats -l | awk '{print $6}' | grep -x $CLIENT | wc -l)" = 0 ]
             then
                 echo ""
-                echo "Invalid input. Please enter a valid hardware uplink from the list. Run the script once more if you wish to choose a different capture level."
+                echo "Invalid input. Please enter a valid hardware uplink from the list. Run the script once more if you wish to choose a different capture point."
             else
                 PCAP_COMMAND="pktcap-uw --uplink $CLIENT"
                 Direction
@@ -655,20 +631,22 @@ while true; do
                     2 ) PCAP_COMMAND=" ${PCAP_COMMAND} --capture UplinkSndKernel"; DIR_TXT="outgoing";;
                     3 ) PCAP_COMMAND=" ${PCAP_COMMAND} --dir 2"; DIR_TXT="bidirectional";;
                 esac
-                Filters
                 break
             fi
             ;;
     esac
 done
 
-#We then call Duration() and Directory() to get the duration of packet captures and the location to save the fil(s) in
+#The functions Filters, Duration and Directory are called to complete construction of the packet capture command
+Filters
 Duration
 Directory
 
 #We confirm that the packet packet capture command has been constructed successfully and print the command for documentation
 echo "
-THANKS FOR THE INPUTS! CAPTURING PACKETS NOW USING THE COMMAND: "$PCAP_COMMAND"
+Thanks for the inputs! Capturing packets now using the command: "$PCAP_COMMAND"
+If you wish to stop capturing packets, press CTRL+C to terminate the script.
+****************************************************************************
 "
 
 #We then execute the packet capture command depending on the duration chosen by the user
