@@ -23,21 +23,18 @@ BEFORE WE START, LET'S UNDERSTAND THE FLOW OF NETWORK PACKETS IN VSPHERE:
      |                                                         |
      |                          ESXi HOST                      |
      |                                                         |
-     |  ++++++++++++++     ++++++++++++++++++++     ++++++++++++++++++++     +++++++++++++++++++++     +++++++++++++++++
-     |  |  VNIC/VMK  | --> |  VIRTUAL SWITCH  | --> | PHYSICAL UPLINK  | --> |  PHYSICAL SWITCH  | --> |  DESTINATION  |
-     |  ++++++++++++++     ++++++++++++++++++++     ++++++++++++++++++++     +++++++++++++++++++++     +++++++++++++++++
+     |  ++++++++++++++      ++++++++++++++++++++      ++++++++++++++++++++      +++++++++++++++++
+     |  |  VNIC/VMK  | <--> |  VIRTUAL SWITCH  | <--> | PHYSICAL UPLINK  | <--> |  DESTINATION  |
+     |  ++++++++++++++      ++++++++++++++++++++      ++++++++++++++++++++      +++++++++++++++++
      |                                                         |
      |                                                         |
      |                                                         |
      +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-> All traffic from a virtual machine network adapter or vmkernel interface goes to a virtual switch port.
-> The virtual switch is software that routes traffic from a client --> a virtual machine network adapter or vmkernel interface.
-> All virtual machines and vmkernel interfaces have a virtual switch port assigned to them.
-> This traffic then goes to a physical adapter.
-> The physical adapter is hardware that transmits traffic to the physical network.
+> All traffic from a virtual machine network adapter or vmkernel interface goes to the virtual switch port assigned to them. 
+> This traffic then goes to a physical adapter. 
 > This is for outgoing traffic. The reverse is true for incoming traffic.
-> We can capture packets at any of these levels to troubleshoot network issues within your vSphere environment.
+> We can capture packets at any of these points to troubleshoot network issues within a vSphere environment.
 
 LET'S BEGIN!'''
 print(intro)
@@ -297,7 +294,7 @@ def Filters(PCAP_COMMAND):
 def Point():
     print("\n++++++++++++++++++++++++++++++\n|    PACKET CAPTURE LEVEL    |\n++++++++++++++++++++++++++++++")
     while True:
-        CAP_POINT=input("\nChoose the packet capture point (1/2/3/4)\n1. vmkernel interface\n2. virtual network adapter\n3. virtual switch port\n4. hardware network adapter/uplink\n")
+        CAP_POINT=input("\nChoose the point you want to capture packets at (1/2/3/4)\n1. vmkernel interface\n2. virtual network adapter\n3. virtual switch port\n4. hardware network adapter/uplink\n")
         if not re.match('^[1-4]$', CAP_POINT):
             print("\nInvalid input. Please choose an option between 1-4.")
         else:
@@ -342,7 +339,7 @@ def Duration(PCAP_COMMAND):
                 PCAP_SIZE_PER_FILE=max(1,int(PCAP_SIZE)//20)
                 PCAP_COMMAND=PCAP_COMMAND+" -C "+str(PCAP_SIZE_PER_FILE)
             break
-    return [PCAP_COMMAND, PCAP_TIME]
+    return [PCAP_COMMAND, PCAP_TIME, int(TIME_CHOICE)]
 
 #Function to input the location to save the packet capture file(s) in
 def Directory(PCAP_COMMAND, DIR_TXT, CAP_POINT_TXT, CLIENT):
@@ -480,7 +477,7 @@ while True:
             
 #The functions Filters, Duration and Directory are called to complete construction of the packet capture command
 PCAP_COMMAND=Filters(PCAP_COMMAND)
-PCAP_COMMAND, PCAP_TIME=Duration(PCAP_COMMAND)
+PCAP_COMMAND, PCAP_TIME, TIME_CHOICE=Duration(PCAP_COMMAND)
 PCAP_COMMAND=Directory(PCAP_COMMAND, DIR_TXT, CAP_POINT_TXT, CLIENT)
 
 #We confirm that the packet packet capture command has been constructed successfully and print the command for documentation
@@ -489,10 +486,11 @@ print("If you wish to stop capturing packets, press CTRL+C to terminate the scri
 print("****************************************************************************\n")
 
 #We then execute the packet capture command depending on the duration chosen by the user
-if PCAP_TIME < 3:
+if TIME_CHOICE < 3:
     for STAMP in range(1,PCAP_TIME+1):
         #Incrementing file number to sustain packet sequence across files
-        PCAP_COMMAND=PCAP_COMMAND[:-(6+len(str(STAMP)))]+"_"+str(STAMP)+".pcap"
+        SPLIT = [i.start() for i in re.finditer("_",PCAP_COMMAND)][2]
+        PCAP_COMMAND=PCAP_COMMAND[:SPLIT]+"_"+str(STAMP)+".pcap"
         COMMAND="eval "+PCAP_COMMAND+" & sleep 180"
         subprocess.call(COMMAND, shell=True)
         subprocess.call("pkill pktcap-uw", shell=True)
@@ -500,7 +498,8 @@ else:
     while True:
         for STAMP in range(1,PCAP_TIME+1):
             #Incrementing file number to sustain packet sequence across files
-            PCAP_COMMAND=PCAP_COMMAND[:-(6+len(str(STAMP)))]+"_"+str(STAMP)+".pcap"
+            SPLIT = [i.start() for i in re.finditer("_",PCAP_COMMAND)][2]
+            PCAP_COMMAND=PCAP_COMMAND[:SPLIT]+"_"+str(STAMP)+".pcap"
             COMMAND="eval "+PCAP_COMMAND+" & sleep 180"
             subprocess.call(COMMAND, shell=True)
             subprocess.call("pkill pktcap-uw", shell=True)
