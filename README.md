@@ -3,8 +3,8 @@
 Designed to help capture packets in VMware vSphere ESXi hosts. The script makes use of the pktcap-uw tool that is in-built in ESXi hypervisors.
 
 The script allows packet captures at the below capture points:
-1. ESXi host VMkernel adapter
-2. ESXi host hardware adapter 
+1. ESXi VMkernel adapter
+2. ESXi physical adapter 
 3. Virtual machine network adapter
 4. Virtual switch port
 
